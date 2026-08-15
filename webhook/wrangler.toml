@@ -1,0 +1,8 @@
+name = "navy-ml-digest-webhook"
+main = "worker.js"
+compatibility_date = "2024-11-01"
+
+# Secrets (TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID, GITHUB_PAT, GITHUB_OWNER, GITHUB_REPO)
+# are NOT set here - add them via:
+#   wrangler secret put TELEGRAM_BOT_TOKEN
+# ...or via the Cloudflare dashboard (Workers & Pages -> your worker -> Settings -> Variables -> Encrypt).
