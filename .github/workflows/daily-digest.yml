@@ -3,7 +3,13 @@ name: Daily Navy & ML Digest
 on:
   schedule:
     - cron: "0 0 * * *"    # 00:00 UTC = 08:00 SGT every day
-  workflow_dispatch: {}     # lets you manually trigger a run from the Actions tab
+
+  workflow_dispatch:
+    inputs:
+      resend:
+        description: "Include stories already sent (last 5 days)"
+        type: boolean
+        default: true
 
 permissions:
   contents: write
@@ -15,7 +21,7 @@ concurrency:                # a /news burst won't start overlapping runs
 jobs:
   digest:
     runs-on: ubuntu-latest
-    timeout-minutes: 10     # 18 feeds x 12s worst case is ~3.6 min on its own
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
 
@@ -30,7 +36,9 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          PYTHONUNBUFFERED: "1"   # so print() shows up live in the Actions log
+          PYTHONUNBUFFERED: "1"
+          # Manual runs resend everything from the window; scheduled runs dedupe.
+          RESEND_ALL: ${{ github.event_name == 'workflow_dispatch' && inputs.resend }}
         run: python -u main.py
 
       - name: Commit updated state
