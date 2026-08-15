@@ -1,3 +1,35 @@
 {
-  "seen": []
+  "seen": [
+    "https://www.navalnews.com/naval-news/2026/08/ultra-maritime-tests-integrated-asw-and-counter-uuv-sonar-system-during-us-navy-exercise/",
+    "https://www.navalnews.com/naval-news/2026/08/f128-tkms-open-to-rheinmetalls-participation-in-the-2nd-lot-of-meko-a-200/",
+    "https://news.usni.org/2026/08/14/usni-news-western-pacific-pulse-aug-14-2026",
+    "https://news.usni.org/2026/08/14/u-s-focused-on-quiet-collaboration-with-pacific-allies-not-tub-thumping-says-colby",
+    "https://news.usni.org/2026/08/13/new-white-house-memo-calls-for-foreign-built-warships-return-to-steam-catapults-on-ford-carriers",
+    "https://news.usni.org/2026/08/13/presidential-memo-rebuilding-the-united-states-navy-and-americas-shipbuilding-industrial-base",
+    "https://www.twz.com/news-features/bunker-talk-lets-talk-about-all-the-things-we-did-and-didnt-cover-this-week-203",
+    "https://www.twz.com/air/army-to-use-robinson-r66-for-its-new-helicopter-pilot-training-concept",
+    "https://www.twz.com/sea/bringing-back-steam-catapults-on-carriers-is-a-huge-risk",
+    "https://www.twz.com/land/hunt-for-new-lower-cost-strike-missile-with-1000-kilometer-range-underway-by-u-s-army",
+    "https://www.twz.com/land/rheinmetall-launches-new-containerized-loitering-munition-from-moving-truck",
+    "https://www.twz.com/news-features/u-s-launching-international-one-way-attack-drone-task-force-in-the-middle-east",
+    "https://www.twz.com/news-features/meet-morfius-the-drone-designed-to-zap-other-drones",
+    "https://www.twz.com/air/australias-mc-55-electronic-warfare-jet-has-entered-the-south-china-sea",
+    "https://news.google.com/rss/articles/CBMivgFBVV95cUxPamFTRDhha2lGLW5hTU1KdDZnVjlxd2hEY1lqX3Zfd2NmVlRXZjVWbDNHMXdJem1SX1hsNUpoaF9lWHhYUVFmUWJ0SDBWRG5uOGMzYzI0MFh6ckthOWJNZXNtR0tJVFJFcEMtVjdwZVFpdURyczZ0NTkzMDh1dDJNRWxKQ2htMEpBQ3N2Q25OY19wRWxaYTVCTmJJRWprVFFSMWNITjl4QmUxQVN1MUFnNHRsRWJGYUpHZ1Ywb0Nn?oc=5",
+    "https://news.google.com/rss/articles/CBMipgFBVV95cUxPaUt4MWdzbHZxLVUyN0xLdHhkZm9abjBjV1dkcTU4WDRsQ19uNEhYX3ByYVJhclhBSTYzN183OWV3MFVPQVQ5aFJEUmxobkZScklNTlJ1cDFqU0xfandXd1dtaW5LUFBpbDNGWmhhZWdodVYwVl9LUm1SNlBQbjJ6QTJfQnItaWlzV21aQVJPN3d2eDd6cG40ZFQwTHg1Qlg1YWUteTN30gGrAUFVX3lxTFA5dEhaOTUxV1VHS3FZdHlZUXNkV25xeGdaSWFDUVllWnpCY0I4ZWt5UkFwY1ZxODJ5MUV6NFJmekpVZE9iX2FZLS1tQ2RCYzd5c3ViNEpabGFsVVAwSnZUUFFFeXpXSkM2czdaREJnWnp1VGw1bTVKdTlPS21mU3BfRUI2bV96dzFlQ0lKY0lzZVJDaHpKYW0yMGd4RDVHcE9tZ0ZWekJzaUY3aw?oc=5",
+    "https://news.google.com/rss/articles/CBMi6gFBVV95cUxQaHNkWFBsTkxET3ZoXzE0SWZQSHdacWxmWnp2OUdwWl8yNndRR2RHS2VRNzVhako4T2x0eHY3TnJnSmZ6U3k4RWl0Vk9WSDlmYmlQSm1XX3R5ekc1NkdmXzFOcl9oQ2lTN3FZZkJMeXVyTzlnQUlYZGZKX2ZIS0pwWUR6cWRucTlOdi1KZlZTUjExQmFUTVBkckVQNllGWXJjV1BfSERiVzZSeGsyY3N2ZGNUSGxyQXBQOEJuZHZmMEQwWjZuVFlabjg1bmh5c21DbktOajkxZXl3SnhwbER0SUpBdnhuQThlX1E?oc=5",
+    "https://news.google.com/rss/articles/CBMimAFBVV95cUxNS0ljQ0hlZ21kR1B3TjNBSVBveGMzTkVDRHQ2dlNPRmExT01fcEtzNDk1RlhJYmc3Q0RFbmJnTUFnNGZKelVJZ1UtNEd4aVNZbTlITDhVM2Y1ZVN2ZEF5RVBoRmF1emlVQy1zOWtHQzI3ckdSVk96akdTemJQNVY3TVlMQ0xHUWExZ3BjRlFzaTQyOTJrTjJpdQ?oc=5",
+    "https://news.google.com/rss/articles/CBMingFBVV95cUxNR0VBb2hVTHpvUWhELV9yV0Z2Q1djVjhTQ0ZfRHk3WU9JWmFxZlQ2eS1aa3A2Mjk1dnA1cUVBWXoxa3BPMGdmcjZ3Y2NKV3RwamhEU2twY3dTcHFDZmVQRm5ZaGVjOXM1NFNjT0E0M0d5eWE3akJWb05CanJYX1VXa1FWTTFXYkh6R3lBZWpXT09jeGhMN1dxd2VGbEFGUdIBowFBVV95cUxNSEgxUW1fUXlYdTh6cGJMS2s1M0o3NElYZWVZdnRSMFR0LThuRVZwY3RvNDhpLVJTUk9BWk1ncTNGLVdEbkRUVjAxZFkzbzFJWl9EZk5BUExDZkUtN0xFbEMzOFhaSkVPWl9QRkI2NWhWZFlVSk9HZnkzbkNraC11VTF5RTZOQVJBTUJUQTdOOEFxUC1kVFllSy1lZ09ra3c3dzRj?oc=5",
+    "https://news.google.com/rss/articles/CBMiYEFVX3lxTE95cXN3MkhBSzZVMWhRR0JpdUZmRmxkMDZob0FfRHdQMXRJVEx0eXdEOHdhbzFsMmJ2TlhxRm5VVWV4Uy1veGlQcjd6MW5LMXE4NTZjZjljbUZnLWJtWTczbA?oc=5",
+    "https://news.google.com/rss/articles/CBMioAFBVV95cUxNZVJydkptQUpoV0ZNeWZWUFVNZklJeEx5UkstdjlIdjl5SVItZm81S0htaUdBTUU0Y1lLUndJcVdUVXFlazE4aTdTR1kwOXZZRVJOTDdKWUxyR25GLUpFYVU2OWh2eXZqVkw2aFcxN2duV3NJVXhMRk1adEJPM1FHMkhhVEtxbUZDY3ZSLW41OE5KMGlvRmFKbU1HaWlIZERQ?oc=5",
+    "https://news.google.com/rss/articles/CBMijwFBVV95cUxNeXdQV093SjhvUjhyZDFLMlNIRmllbTFveC10aGxITlVEa1ZzVVhhVkZJUE84OUJMeHhfUE9GTE5jSmJYNEdTbTVwb0N5NWRROENmZ1BfT2NfdThOOWpuWjFHQmpqeHM5b0dUbzhEZ3NkUWlmNnJfa0FEZ3FZUEQ3cVAwR0Z1YnNPYmxzc0JGcw?oc=5",
+    "https://news.google.com/rss/articles/CBMiS0FVX3lxTE1GMGlXU0pIUnJfMDA1dnc1Sk51NDRJamdkVDhfT0xIVXBPNjV4WkstOGJlbm11QUc1ZWFtWWxCS0RUNHl3aFdYRS1qNA?oc=5",
+    "https://news.google.com/rss/articles/CBMixgFBVV95cUxOYVFydWotdzdMWWctTXJNVi14Q3YwQjNnaTNscjN5NDRYTjNXSWQwblk1LUJJWXdyTWxLMURYcjBhVzBoc0RXYlh3MnhDZEU4QTNyV1lBTC15ZTRyVmVsUGNMelNwMGVENHVGZlZ0Rks1dFB1SnZoQllVMjh1eEtrTE5EaWFPOWlGNUlpVkh0YTYySFFhX0Q5Z3hKWW5HVGVLUHlEdVZpZ1FQbXJWUkstWWxPeDBMeUtSYXdCbG42WERkTDlxU3c?oc=5",
+    "https://news.google.com/rss/articles/CBMirgFBVV95cUxNTVBOTXhzdU1DUmFZVk9lVmFiYXZUZndyUlRuQzA5TGRfNm9NRUg1eGtzZEc3TzZsVlloQTFMVWxBMVFsUlJWOUx3M2xENVp0c0xDYTgwYnhlU3llY1hfMjBKVm10cU1JYlJxYXZNQWoyaGR6Q3JFSDZ0OXhBVlcwNmwtOUtla2t1dGhwOGhEUFl2clZKQjM2TFF1SHZSNEE0QTRKTkJwYXZpVHkydUHSAbMBQVVfeXFMTWFYbkV5dmRyZUFsaHF6UUxfTlM0c3J1dGZoNDQ3ZTlxTFVJMnJsblZFVFBjUEJkSEt1TDJJTEhVVVotX19ZQWtKdlh0TURJWVZSNEJSempWX3VYU0FiSXdld1hsY2JRaElMM2pEdUVEZnVPTFpsalIxbVE1UlcyTFpLeFJRUW4wd0lZbjlESWFjY0dfaHBENjAzQjloUWQwQ3hrRXZpYWdValk1TnRUajhpSkk?oc=5",
+    "https://blogs.nvidia.com/blog/ugm-indosat-nvidia-ai-technology-center/",
+    "https://news.google.com/rss/articles/CBMixgFBVV95cUxPTjQ2V2cxUlNPQkUzNGk1YVAzRlg4b1NCdXhpMlRIOXhnTER2ZEFqOG1jM3RHdGhSdUFLd281cTE5bGw5Ql85dm5GaTB1LS15WjYtQ0FsS2ZoZHFkT01vVjdPSk1zcjhlTm1OVnFqZUdhZ0l1aExUWm51VFdQWWpJMndTeG82MHk2US1BdC1jR3JhUFJiaWNFQ2hqaFhSVmNZTlg5T0cwRFlaLUJ4SG1RQW55aG1RcjNna2ZPa0RQX3JST1NvZkHSAcIBQVVfeXFMT1NZVXQtTXktTnFzbS1lRTFqdlM3RXg3R0xWbktsNHc2U0NQT2JFeUR3UmcyU3lneF9qdy05RFd2b0ItaUNoT0dSM0g1bU1ZSGJKYXRuWTBhLWlBaDIzNm85NHhxMWRPNDVRcVV2cG9Cdy1BM2lWRFlTd0xJM1JvYld3ZlpZN2NWZ0FIYWlMUm9fY3I0S2hSNlhCSzVESDR2QTBtaGstZFVfcTBIS21VQjBKd1Y1TE1Mc285R2YycGtpQXc?oc=5",
+    "https://news.google.com/rss/articles/CBMiV0FVX3lxTFBCLW9XT2JXWll5Z2d1NnpmWVdNS0RaX0dYdy1YNVhvLUZhcnJqVm5TN1RFRTRHbjVWeGgyM21kSjEwRklvZ1ZCTWJSQ2RpQkptenZDOWZpdw?oc=5",
+    "https://news.google.com/rss/articles/CBMiiAFBVV95cUxOcWxSRl9aV0dyUVl1MXF3aTc4VEFHRWtuYmRMeVFwUlhXcVYzeFkyVV9Hdmp0Mktpd0EzeWwtbFdyV3pOQk1LWFNtMFFVSkhOSjlNZzQ4NkZUcVB2dWRURDE3QXpQQmN0ZHI1eF9wdlk3eGhfQ1FVWjRUSEtlX0tqWUo0X3UzWTg3?oc=5",
+    "https://news.google.com/rss/articles/CBMitgFBVV95cUxOYnJhWGkzZE9IWHVCREo0R2tJb1dXMGZ0T0NkT0RrZHpxMTVLNjlEbm8yM01hYUg4cGhTY25CdUV0YVJmRDM2VUt5ekJqdThTWkVudEtvZ0tOazJ4R0xZb1ZzOHZOZU9MRy1EOEdfdGtLZjJiX3VxTFFKZjRldjlSZ3E1MUQ0azdpSGNxZmpXZVJ2TGxGREhJc1MtSnFFWERYejhSVGxiTmQ3ZWJSTnlZV3lOSjBjUQ?oc=5",
+    "https://news.google.com/rss/articles/CBMiuAFBVV95cUxNeTdSZUhUcTVtNlJodkFfeXZualFrYkVxaEtfR1lOWjlWOWVra0tWY2RFTmlfNFdpVkFBTmNwaVdJdzY0QzM3NXpDSExTSU9rbmFsRjRheE95YjIzQlRHSjdpd2NnbDFnUXREMzc2UzBISFo4MVdIak5TdUhhSkNtcXVYUHdpalo1VjI0R21sendfd09BNWtlaGhPcnh2WXJKMmJvSEd2TDFURG9WUzNCbGxrczAyS0tC?oc=5"
+  ]
 }
