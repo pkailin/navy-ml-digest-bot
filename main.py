@@ -33,6 +33,11 @@ LOOKBACK_DAYS_LABEL = "5 days"
 # just sorting them to the bottom.
 NAVY_USV_ONLY = False
 
+# When set (manual runs), ignore the "already sent" list and include everything
+# from the lookback window. Scheduled runs leave this off so you never get the
+# same story twice on consecutive mornings.
+RESEND_ALL = os.environ.get("RESEND_ALL", "").strip().lower() in ("1", "true", "yes")
+
 BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
 CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
 
@@ -113,7 +118,7 @@ COMPANY_FEEDS = [
 
     ("Saronic Technologies", gnews('Saronic USV OR "surface vessel"')),
 
-    ("Anduril (maritime)", gnews('Anduril maritime OR "surface vessel" OR Kraken')),
+    ("Anduril (maritime)", gnews('Anduril maritime OR "surface vessel"')),
 
     ("HavocAI", gnews('HavocAI OR "Havoc AI" unmanned vessel')),
 
@@ -121,23 +126,12 @@ COMPANY_FEEDS = [
 
     ("Saildrone", gnews('Saildrone navy OR surveillance OR contract')),
 
-    ("Seasats", gnews('Seasats USV OR "Lightfish"')),
-
-    ("Ocean Aero", gnews('"Ocean Aero" Triton OR autonomous vessel')),
-
-    ("Maritime Robotics", gnews('"Maritime Robotics" USV OR Otter OR Mariner')),
-
     ("Exail", gnews('Exail USV OR DriX OR "mine countermeasure"')),
 
     ("Kongsberg / Elbit Seagull", gnews('Kongsberg OR "Elbit Seagull" unmanned surface vessel')),
 
-    ("Textron & L3Harris unmanned maritime", gnews('"Textron Systems" OR L3Harris unmanned surface vessel')),
-
-    ("Ocius / Zycraft (APAC)", gnews('Ocius OR Zycraft OR "Bluebottle" unmanned vessel')),
-
-    ("Kraken Technology Group", gnews('"Kraken Technology Group" OR K-series unmanned vessel')),
-
-    ("Magura", gnews('"Magura" OR unmanned vessel')), 
+    # Catch-all so the smaller builders still get covered without their own slot.
+    ("Other USV builders", gnews('Seasats OR "Ocean Aero" OR "Maritime Robotics" OR "Textron Systems" OR Ocius OR Zycraft OR "Kraken Technology" unmanned vessel')),
 ]
 
 # --- LinkedIn posts (needs a one-time bridge setup) ---------------------------
@@ -231,7 +225,9 @@ def fetch_all(feeds) -> dict:
     return parsed
 
 
-def fetch_section(feeds, seen_set: set, cutoff: datetime) -> list:
+def fetch_section(feeds, seen_set: set, cutoff: datetime, run_links: set) -> list:
+    """run_links dedupes within a single run and applies even when RESEND_ALL is
+    on, so a story matched by two sections still only appears once."""
     parsed_by_url = fetch_all(feeds)
     items = []
     seen_titles = set()
@@ -243,7 +239,9 @@ def fetch_section(feeds, seen_set: set, cutoff: datetime) -> list:
             continue
         for entry in parsed.entries[:MAX_ITEMS_PER_FEED]:
             link = entry.get("link")
-            if not link or link in seen_set:
+            if not link or link in run_links:
+                continue
+            if link in seen_set and not RESEND_ALL:
                 continue
             pub = entry_time(entry)
             if pub and pub < cutoff:
@@ -256,7 +254,7 @@ def fetch_section(feeds, seen_set: set, cutoff: datetime) -> list:
                 continue
             seen_titles.add(key)
             items.append({"label": label, "title": title, "link": link})
-            seen_set.add(link)
+            run_links.add(link)
     return items
 
 
@@ -328,16 +326,20 @@ def main() -> None:
     seen_list = state.get("seen", [])
     seen_set = set(seen_list)
     cutoff = datetime.now(timezone.utc) - timedelta(hours=LOOKBACK_HOURS)
+    run_links = set()
+    if RESEND_ALL:
+        print("RESEND_ALL is on: including items already sent.", flush=True)
 
-    navy_items = rank_usv_first(fetch_section(NAVY_FEEDS, seen_set, cutoff))[:MAX_ITEMS_PER_SECTION]
-    war_items = fetch_section(WAR_FEEDS, seen_set, cutoff)[:MAX_ITEMS_PER_SECTION]
-    ml_items = fetch_section(ML_FEEDS, seen_set, cutoff)[:MAX_ITEMS_PER_SECTION]
-    company_items = fetch_section(COMPANY_FEEDS + LINKEDIN_FEEDS, seen_set, cutoff)[:MAX_ITEMS_PER_SECTION]
+    navy_items = rank_usv_first(fetch_section(NAVY_FEEDS, seen_set, cutoff, run_links))[:MAX_ITEMS_PER_SECTION]
+    war_items = fetch_section(WAR_FEEDS, seen_set, cutoff, run_links)[:MAX_ITEMS_PER_SECTION]
+    ml_items = fetch_section(ML_FEEDS, seen_set, cutoff, run_links)[:MAX_ITEMS_PER_SECTION]
+    company_items = fetch_section(COMPANY_FEEDS + LINKEDIN_FEEDS, seen_set, cutoff, run_links)[:MAX_ITEMS_PER_SECTION]
     print(f"Found: navy={len(navy_items)} war={len(war_items)} ml={len(ml_items)} "
           f"companies={len(company_items)}", flush=True)
 
     today = datetime.now(timezone.utc).strftime("%d %b %Y")
-    parts = [f"\U0001F5DE\uFE0F *Daily Digest \u2014 {today}*"]
+    tag = " (full refresh)" if RESEND_ALL else ""
+    parts = [f"\U0001F5DE\uFE0F *Daily Digest \u2014 {today}{tag}*"]
 
     sections = [
         format_section("\U0001F6A2 Navy / Naval News", navy_items),
@@ -354,9 +356,12 @@ def main() -> None:
         print("Some messages failed to send; not recording items as seen.", flush=True)
         raise SystemExit(1)
 
-    # Only mark items seen once they've actually been delivered.
+    # Record what went out. Guarded against duplicates so repeated manual runs
+    # don't bloat state.json with links that are already in there.
     for it in navy_items + war_items + ml_items + company_items:
-        seen_list.append(it["link"])
+        if it["link"] not in seen_set:
+            seen_set.add(it["link"])
+            seen_list.append(it["link"])
     state["seen"] = seen_list
     save_state(state)
 
