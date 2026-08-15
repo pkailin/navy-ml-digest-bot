@@ -21,7 +21,9 @@ LOOKBACK_HOURS = 30          # only include items published within this window
 MAX_SEEN_STORED = 1500       # cap the dedupe list so state.json doesn't grow forever
 REQUEST_TIMEOUT = 15
 FEED_TIMEOUT = 12            # hard cap per feed fetch so one slow source can't hang the run
-MAX_ITEMS_PER_FEED = 15
+MAX_ITEMS_PER_FEED = 8
+MAX_ITEMS_PER_SECTION = 25   # keep a single run from flooding your chat
+TELEGRAM_CHUNK = 3500        # Telegram's hard limit is 4096
 
 BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
 CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
@@ -133,67 +135,87 @@ def format_section(header: str, items: list) -> str:
     return "\n".join(lines)
 
 
-def send_telegram(text: str) -> None:
-    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-    # Telegram's hard limit is 4096 chars; chunk safely under that.
-    remaining = text
+def chunk_message(text: str, limit: int = TELEGRAM_CHUNK) -> list:
+    """Split a long message on line boundaries, always making forward progress."""
     chunks = []
+    remaining = text
     while remaining:
-        if len(remaining) <= 3500:
+        if len(remaining) <= limit:
             chunks.append(remaining)
             break
-        split_at = remaining.rfind("\n\n", 0, 3500)
-        if split_at == -1:
-            split_at = 3500
+        window = remaining[:limit]
+        split_at = window.rfind("\n\n")
+        if split_at <= 0:
+            split_at = window.rfind("\n")
+        if split_at <= 0:
+            split_at = limit          # no newline at all: hard cut
         chunks.append(remaining[:split_at])
-        remaining = remaining[split_at:]
+        remaining = remaining[split_at:].lstrip("\n")
+    return [c for c in chunks if c.strip()]
 
-    for chunk in chunks:
-        resp = requests.post(
-            url,
-            data={
-                "chat_id": CHAT_ID,
-                "text": chunk,
-                "parse_mode": "Markdown",
-                "disable_web_page_preview": False,
-            },
-            timeout=REQUEST_TIMEOUT,
-        )
+
+def send_telegram(text: str) -> bool:
+    """Send the digest, splitting it across messages. Returns True if all parts sent."""
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+    chunks = chunk_message(text)
+    print(f"Sending {len(chunks)} message(s), {len(text)} chars total", flush=True)
+
+    all_ok = True
+    for i, chunk in enumerate(chunks, 1):
+        try:
+            resp = requests.post(
+                url,
+                data={
+                    "chat_id": CHAT_ID,
+                    "text": chunk,
+                    "parse_mode": "Markdown",
+                    "disable_web_page_preview": True,
+                },
+                timeout=REQUEST_TIMEOUT,
+            )
+        except Exception as e:
+            print(f"Telegram request failed on chunk {i}: {e}", flush=True)
+            all_ok = False
+            continue
         if not resp.ok:
-            print("Telegram error:", resp.status_code, resp.text)
+            print(f"Telegram error on chunk {i}:", resp.status_code, resp.text, flush=True)
+            all_ok = False
         time.sleep(1)
+    return all_ok
 
 
 def main() -> None:
     state = load_state()
-    seen_set = set(state["seen"])
+    seen_list = state.get("seen", [])
+    seen_set = set(seen_list)
     cutoff = datetime.now(timezone.utc) - timedelta(hours=LOOKBACK_HOURS)
 
-    navy_items = fetch_section(NAVY_FEEDS, seen_set, cutoff)
-    war_items = fetch_section(WAR_FEEDS, seen_set, cutoff)
-    ml_items = fetch_section(ML_FEEDS, seen_set, cutoff)
+    navy_items = fetch_section(NAVY_FEEDS, seen_set, cutoff)[:MAX_ITEMS_PER_SECTION]
+    war_items = fetch_section(WAR_FEEDS, seen_set, cutoff)[:MAX_ITEMS_PER_SECTION]
+    ml_items = fetch_section(ML_FEEDS, seen_set, cutoff)[:MAX_ITEMS_PER_SECTION]
+    print(f"Found: navy={len(navy_items)} war={len(war_items)} ml={len(ml_items)}", flush=True)
 
     today = datetime.now(timezone.utc).strftime("%d %b %Y")
     parts = [f"\U0001F5DE\uFE0F *Daily Digest \u2014 {today}*"]
 
-    navy_section = format_section("\U0001F6A2 Navy / Naval News", navy_items)
-    war_section = format_section("\u2694\uFE0F War & Conflict Tech (Ukraine, Red Sea, etc.)", war_items)
-    ml_section = format_section("\U0001F916 ML \u2022 Autonomous Vehicles \u2022 NVIDIA", ml_items)
-
-    if navy_section:
-        parts.append(navy_section)
-    if war_section:
-        parts.append(war_section)
-    if ml_section:
-        parts.append(ml_section)
+    sections = [
+        format_section("\U0001F6A2 Navy / Naval News", navy_items),
+        format_section("\u2694\uFE0F War & Conflict Tech (Ukraine, Red Sea, etc.)", war_items),
+        format_section("\U0001F916 ML \u2022 Autonomous Vehicles \u2022 NVIDIA", ml_items),
+    ]
+    parts.extend(s for s in sections if s)
 
     if len(parts) == 1:
         parts.append("_No new items in the last 24h._")
 
-    message = "\n\n".join(parts)
-    send_telegram(message)
+    if not send_telegram("\n\n".join(parts)):
+        print("Some messages failed to send; not recording items as seen.", flush=True)
+        raise SystemExit(1)
 
-    state["seen"] = list(seen_set)
+    # Only mark items seen once they've actually been delivered.
+    for it in navy_items + war_items + ml_items:
+        seen_list.append(it["link"])
+    state["seen"] = seen_list
     save_state(state)
 
 
