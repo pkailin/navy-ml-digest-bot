@@ -10,6 +10,7 @@ import json
 import time
 import html
 import urllib.parse
+import socket
 from datetime import datetime, timedelta, timezone
 
 import feedparser
@@ -19,6 +20,7 @@ STATE_FILE = "state.json"
 LOOKBACK_HOURS = 30          # only include items published within this window
 MAX_SEEN_STORED = 1500       # cap the dedupe list so state.json doesn't grow forever
 REQUEST_TIMEOUT = 15
+FEED_TIMEOUT = 12            # hard cap per feed fetch so one slow source can't hang the run
 MAX_ITEMS_PER_FEED = 15
 
 BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
@@ -83,13 +85,22 @@ def entry_time(entry):
     return None
 
 
+def fetch_feed_with_timeout(url: str):
+    """Fetch a feed URL with a hard timeout, then hand the bytes to feedparser.
+    (feedparser.parse() alone has no timeout and can hang forever on a slow server.)"""
+    headers = {"User-Agent": "Mozilla/5.0 (compatible; navy-ml-digest-bot/1.0)"}
+    resp = requests.get(url, headers=headers, timeout=FEED_TIMEOUT)
+    resp.raise_for_status()
+    return feedparser.parse(resp.content)
+
+
 def fetch_section(feeds, seen_set: set, cutoff: datetime) -> list:
     items = []
     for label, url in feeds:
         try:
-            parsed = feedparser.parse(url)
+            parsed = fetch_feed_with_timeout(url)
         except Exception as e:
-            print(f"WARN: failed to parse {label}: {e}")
+            print(f"WARN: failed to fetch {label} ({url}): {e}")
             continue
         for entry in parsed.entries[:MAX_ITEMS_PER_FEED]:
             link = entry.get("link")
