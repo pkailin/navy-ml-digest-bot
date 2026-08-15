@@ -25,7 +25,7 @@ REQUEST_TIMEOUT = 15
 FEED_TIMEOUT = 12            # hard cap per feed fetch so one slow source can't hang the run
 MAX_ITEMS_PER_FEED = 10
 MAX_WORKERS = 8              # parallel feed fetches
-MAX_ITEMS_PER_SECTION = 30   # items are one line each now, so this fits comfortably
+MAX_ITEMS_PER_SECTION = 10   # top N articles shown per section
 TELEGRAM_CHUNK = 3500        # Telegram's hard limit is 4096
 LOOKBACK_DAYS_LABEL = "5 days"
 
@@ -195,11 +195,11 @@ def is_usv(title: str) -> bool:
 
 
 def rank_usv_first(items: list) -> list:
-    """USV stories to the top, everything else after, order preserved within each group."""
-    hits = [it for it in items if is_usv(it["title"])]
+    """USV stories to the top, everything else after, each group newest-first."""
+    hits = by_recency([it for it in items if is_usv(it["title"])])
     if NAVY_USV_ONLY:
         return hits
-    return hits + [it for it in items if not is_usv(it["title"])]
+    return hits + by_recency([it for it in items if not is_usv(it["title"])])
 
 
 def normalize_title(title: str) -> str:
@@ -226,10 +226,15 @@ def fetch_all(feeds) -> dict:
 
 
 def fetch_section(feeds, seen_set: set, cutoff: datetime, run_links: set) -> list:
-    """run_links dedupes within a single run and applies even when RESEND_ALL is
-    on, so a story matched by two sections still only appears once."""
+    """Collect items per feed, then interleave them round-robin so that when the
+    section is trimmed to MAX_ITEMS_PER_SECTION every feed gets a slot before any
+    feed gets a second one. Without this, the feeds declared first would fill the
+    whole section and later ones would never appear.
+
+    run_links dedupes within a single run and applies even when RESEND_ALL is on,
+    so a story matched by two sections still only appears once."""
     parsed_by_url = fetch_all(feeds)
-    items = []
+    per_feed = []
     seen_titles = set()
     # Walk feeds in declared order so output doesn't shuffle based on which
     # feed happened to respond first.
@@ -237,6 +242,7 @@ def fetch_section(feeds, seen_set: set, cutoff: datetime, run_links: set) -> lis
         parsed = parsed_by_url.get(url)
         if parsed is None:
             continue
+        bucket = []
         for entry in parsed.entries[:MAX_ITEMS_PER_FEED]:
             link = entry.get("link")
             if not link or link in run_links:
@@ -253,9 +259,27 @@ def fetch_section(feeds, seen_set: set, cutoff: datetime, run_links: set) -> lis
             if key in seen_titles:
                 continue
             seen_titles.add(key)
-            items.append({"label": label, "title": title, "link": link})
+            bucket.append({"label": label, "title": title, "link": link, "pub": pub})
             run_links.add(link)
-    return items
+        if bucket:
+            per_feed.append(bucket)
+    return interleave(per_feed)
+
+
+def interleave(buckets: list) -> list:
+    """Round-robin: first item of every feed, then second of every feed, etc."""
+    out = []
+    for i in range(max((len(b) for b in buckets), default=0)):
+        for b in buckets:
+            if i < len(b):
+                out.append(b[i])
+    return out
+
+
+def by_recency(items: list) -> list:
+    """Newest first. Items with no publish date keep their relative order at the end."""
+    oldest = datetime.min.replace(tzinfo=timezone.utc)
+    return sorted(items, key=lambda it: it.get("pub") or oldest, reverse=True)
 
 
 def escape_md(text: str) -> str:
@@ -331,9 +355,9 @@ def main() -> None:
         print("RESEND_ALL is on: including items already sent.", flush=True)
 
     navy_items = rank_usv_first(fetch_section(NAVY_FEEDS, seen_set, cutoff, run_links))[:MAX_ITEMS_PER_SECTION]
-    war_items = fetch_section(WAR_FEEDS, seen_set, cutoff, run_links)[:MAX_ITEMS_PER_SECTION]
-    ml_items = fetch_section(ML_FEEDS, seen_set, cutoff, run_links)[:MAX_ITEMS_PER_SECTION]
-    company_items = fetch_section(COMPANY_FEEDS + LINKEDIN_FEEDS, seen_set, cutoff, run_links)[:MAX_ITEMS_PER_SECTION]
+    war_items = by_recency(fetch_section(WAR_FEEDS, seen_set, cutoff, run_links)[:MAX_ITEMS_PER_SECTION])
+    ml_items = by_recency(fetch_section(ML_FEEDS, seen_set, cutoff, run_links)[:MAX_ITEMS_PER_SECTION])
+    company_items = by_recency(fetch_section(COMPANY_FEEDS + LINKEDIN_FEEDS, seen_set, cutoff, run_links)[:MAX_ITEMS_PER_SECTION])
     print(f"Found: navy={len(navy_items)} war={len(war_items)} ml={len(ml_items)} "
           f"companies={len(company_items)}", flush=True)
 
